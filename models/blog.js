@@ -28,3 +28,5 @@ blogSchema.set('toJSON', {
     delete returnedObj.__v
   },
 })
+
+export default mongoose.model('Blog', blogSchema)
