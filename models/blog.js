@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
-import config from '../utils/config.js'
-import logger from '../utils/logger.js'
+const mongoose = require('mongoose')
+const config = require('../utils/config.js')
+const logger = require('../utils/logger.js')
 
 const url = config.MONGODB_URI
 
@@ -29,4 +29,4 @@ blogSchema.set('toJSON', {
   },
 })
 
-export default mongoose.model('Blog', blogSchema)
+module.exports = mongoose.model('Blog', blogSchema)

@@ -1,8 +1,8 @@
-import cors from 'cors'
-import helmet from 'helmet'
-import express from 'express'
-import blogsRouter from './controllers/blogs.js'
-import middleware from './utils/middleware.js'
+const cors = require('cors')
+const helmet = require('helmet')
+const express = require('express')
+const blogsRouter = require('./controllers/blogs.js')
+const middleware = require('./utils/middleware.js')
 const app = express()
 
 app.use(cors())
@@ -14,4 +14,4 @@ app.use('/api/blogs', blogsRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 
-export default app
+module.exports = app

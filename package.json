@@ -3,15 +3,19 @@
   "version": "1.0.0",
   "description": "blog list back-end app",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "jest --verbose"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "author": "Vu Nguyen",
   "license": "MIT",
   "devDependencies": {
+    "jest": "^27.1.0",
     "nodemon": "^2.0.12"
   },
   "dependencies": {

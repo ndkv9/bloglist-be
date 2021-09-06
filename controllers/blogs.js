@@ -1,5 +1,5 @@
-import Blog from '../models/blog.js'
-import express from 'express'
+const Blog = require('../models/blog.js')
+const express = require('express')
 const blogsRouter = express.Router()
 
 blogsRouter.get('/', (_req, res) => {
@@ -26,4 +26,4 @@ blogsRouter.post('/', (req, res, next) => {
     .catch(error => next(error))
 })
 
-export default blogsRouter
+module.exports = blogsRouter

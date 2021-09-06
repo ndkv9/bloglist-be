@@ -12,4 +12,4 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-export default { unknownEndpoint, errorHandler }
+module.exports = { unknownEndpoint, errorHandler }
