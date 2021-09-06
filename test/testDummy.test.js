@@ -95,3 +95,23 @@ describe('favorite blog', () => {
     expect(listHelper.favoriteBlog(blogs)).toEqual(blogs[2])
   })
 })
+
+describe('author has most blogs', () => {
+  test('of an empty list', () => {
+    expect(listHelper.mostBlogs([])).toBeUndefined()
+  })
+
+  test('of a list with a single blog', () => {
+    expect(listHelper.mostBlogs(listWithOneBlog)).toEqual({
+      author: listWithOneBlog[0].author,
+      blogs: 1,
+    })
+  })
+
+  test('of a bigger list', () => {
+    expect(listHelper.mostBlogs(blogs)).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3,
+    })
+  })
+})

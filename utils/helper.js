@@ -1,3 +1,5 @@
+const _ = require('lodash')
+
 const dummy = arr => {
   console.log(arr)
   return 1
@@ -19,4 +21,19 @@ const favoriteBlog = arr => {
   )
 }
 
-module.exports = { dummy, totalLikes, favoriteBlog }
+const mostBlogs = arr => {
+  if (arr.length === 0) return undefined
+  if (arr.length === 1) return { author: arr[0].author, blogs: 1 }
+
+  const mostOccurence = _.head(
+    _(arr.map(blog => blog.author))
+      .countBy()
+      .entries()
+      .maxBy(_.last),
+  )
+  const amount = arr.filter(blog => blog.author === mostOccurence).length
+
+  return { author: mostOccurence, blogs: amount }
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs }
