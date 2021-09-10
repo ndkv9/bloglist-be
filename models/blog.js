@@ -15,7 +15,7 @@ mongoose
   })
 
 const blogSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  title: String,
   author: String,
   url: String,
   likes: Number,

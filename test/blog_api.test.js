@@ -56,10 +56,9 @@ describe('adds a new blog', () => {
     expect(titles).toContain('My Testing Blog')
   })
 
-  test('blog without title cannot be added', async () => {
+  test('blog without title and url cannot be added', async () => {
     const blog = {
       author: 'Me',
-      url: 'www.myblog.me',
     }
 
     await api.post('/api/blogs').send(blog).expect(400)
