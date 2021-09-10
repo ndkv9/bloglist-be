@@ -67,57 +67,63 @@ describe('adds a new blog', () => {
   })
 })
 
-test('a specific blog can be viewed', async () => {
-  const blogsAtStart = await helper.blogsInDB()
-  const blogToView = blogsAtStart[0]
+describe('a specific blog can be', () => {
+  test('viewed as expected', async () => {
+    const blogsAtStart = await helper.blogsInDB()
+    const blogToView = blogsAtStart[0]
 
-  const returnedBlog = await api
-    .get(`/api/blogs/${blogToView.id}`)
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+    const returnedBlog = await api
+      .get(`/api/blogs/${blogToView.id}`)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
-  const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
-  expect(returnedBlog.body).toEqual(processedBlogToView)
-})
+    const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
+    expect(returnedBlog.body).toEqual(processedBlogToView)
+  })
 
-test('a blog can be deleted', async () => {
-  const blogsAtStart = await helper.blogsInDB()
-  const blogToDel = blogsAtStart[0]
+  test('deleted', async () => {
+    const blogsAtStart = await helper.blogsInDB()
+    const blogToDel = blogsAtStart[0]
 
-  await api.delete(`/api/blogs/${blogToDel.id}`).expect(204)
+    await api.delete(`/api/blogs/${blogToDel.id}`).expect(204)
 
-  const blogsAtEnd = await helper.blogsInDB()
-  const titles = blogsAtEnd.map(b => b.title)
+    const blogsAtEnd = await helper.blogsInDB()
+    const titles = blogsAtEnd.map(b => b.title)
 
-  expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
-  expect(titles).not.toContain(blogToDel.title)
-})
-
-test('verify id property', async () => {
-  const blogs = await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
-
-  blogs.body.map(b => {
-    expect(b.id).toBeDefined()
+    expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+    expect(titles).not.toContain(blogToDel.title)
   })
 })
 
-test('verify the likes property values is 0 if it is missing', async () => {
-  const blogToSave = {
-    title: 'Clean Code',
-    author: 'Uncle Bob',
-    url: 'www.unclebob.dev',
-  }
+describe('verify properties of blogs', () => {
+  test('verify id property', async () => {
+    const blogs = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
 
-  const returnedBlog = await api
-    .post('/api/blogs')
-    .send(blogToSave)
-    .expect(201)
-    .expect('Content-Type', /application\/json/)
+    blogs.body.map(b => {
+      expect(b.id).toBeDefined()
+    })
+  })
 
-  expect(returnedBlog.body.likes).toBe(0)
+  test('verify the likes property values is 0 if it is missing', async () => {
+    const blogToSave = {
+      title: 'testing blog',
+      author: 'Me',
+      url: 'www.ahihi.me',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(blogToSave)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDB()
+    const addedBlog = blogsAtEnd.find(b => b.url === blogToSave.url)
+    expect(addedBlog.likes).toBe(0)
+  })
 })
 
 afterAll(() => {

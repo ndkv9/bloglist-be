@@ -18,19 +18,35 @@ blogsRouter.get('/:id', async (req, res) => {
 
 blogsRouter.post('/', async (req, res) => {
   const body = req.body
-  if (body.title && body.url) {
-    const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes || 0,
-    })
+  if (!body.title || !body.url) {
+    return res.status(400).json({ error: 'missing title and url' })
+  }
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes || 0,
+  })
 
-    const savedBlog = await blog.save()
-    return res.status(201).json(savedBlog)
+  const savedBlog = await blog.save()
+  return res.status(201).json(savedBlog)
+})
+
+blogsRouter.put('/:id', async (req, res) => {
+  const body = req.body
+
+  const blogObj = {
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes,
   }
 
-  res.status(400).json({ error: 'missing title and url' })
+  const savedBlog = await Blog.findByIdAndUpdate(req.params.id, blogObj, {
+    new: true,
+  })
+
+  res.json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
