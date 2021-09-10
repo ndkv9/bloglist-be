@@ -1,14 +1,15 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
+const helper = require('./test_helper')
 const app = require('../app')
 const api = supertest(app)
 const Blog = require('../models/blog')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObj = new Blog(initialBlogs[0])
+  let blogObj = new Blog(helper.initialBlogs[0])
   await blogObj.save()
-  blogObj = new Blog(initialBlogs[1])
+  blogObj = new Blog(helper.initialBlogs[1])
   await blogObj.save()
 })
 
@@ -23,7 +24,7 @@ describe('when return blogs from server', () => {
   test('there are two blogs at the beginning', async () => {
     const response = await api.get('/api/blogs')
 
-    expect(response.body).toHaveLength(initialBlogs.length)
+    expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
   test('a specific blog is within the returned blogs', async () => {
@@ -48,9 +49,9 @@ describe('adds a new blog', () => {
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
-    const titles = response.body.map(r => r.title)
-    expect(response.body).toHaveLength(initialBlogs.length + 1)
+    const blogsAtEnd = await helper.blogsInDB()
+    const titles = blogsAtEnd.map(r => r.title)
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
     expect(titles).toContain('My Testing Blog')
   })
 
@@ -61,8 +62,8 @@ describe('adds a new blog', () => {
     }
 
     await api.post('/api/blogs').send(blog).expect(400)
-    const response = await api.get('/api/blogs')
-    expect(response.body).toHaveLength(initialBlogs.length)
+    const blogsAtEnd = await helper.blogsInDB()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
 })
 
