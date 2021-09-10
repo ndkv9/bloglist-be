@@ -67,6 +67,32 @@ describe('adds a new blog', () => {
   })
 })
 
+test('a specific blog can be viewed', async () => {
+  const blogsAtStart = await helper.blogsInDB()
+  const blogToView = blogsAtStart[0]
+
+  const returnedBlog = await api
+    .get(`/api/blogs/${blogToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
+  expect(returnedBlog.body).toEqual(processedBlogToView)
+})
+
+test('a blog can be deleted', async () => {
+  const blogsAtStart = await helper.blogsInDB()
+  const blogToDel = blogsAtStart[0]
+
+  await api.delete(`/api/blogs/${blogToDel.id}`).expect(204)
+
+  const blogsAtEnd = await helper.blogsInDB()
+  const titles = blogsAtEnd.map(b => b.title)
+
+  expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
+  expect(titles).not.toContain(blogToDel.title)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
