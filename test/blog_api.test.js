@@ -105,6 +105,22 @@ test('verify id property', async () => {
   })
 })
 
+test('verify the likes property values is 0 if it is missing', async () => {
+  const blogToSave = {
+    title: 'Clean Code',
+    author: 'Uncle Bob',
+    url: 'www.unclebob.dev',
+  }
+
+  const returnedBlog = await api
+    .post('/api/blogs')
+    .send(blogToSave)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  expect(returnedBlog.body.likes).toBe(0)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
