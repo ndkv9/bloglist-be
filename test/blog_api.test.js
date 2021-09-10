@@ -94,6 +94,17 @@ test('a blog can be deleted', async () => {
   expect(titles).not.toContain(blogToDel.title)
 })
 
+test('verify id property', async () => {
+  const blogs = await api
+    .get('/api/blogs')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  blogs.body.map(b => {
+    expect(b.id).toBeDefined()
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
