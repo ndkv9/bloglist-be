@@ -26,24 +26,47 @@ beforeEach(async () => {
   await blogObj.save()
 })
 
-test('blogs are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/)
+describe('when return blogs from server', () => {
+  test('blogs are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('there are two blogs at the beginning', async () => {
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(initialBlogs.length)
+  })
+
+  test('a specific blog is within the returned blogs', async () => {
+    const response = await api.get('/api/blogs')
+
+    const titles = response.body.map(r => r.title)
+    expect(titles).toContain('Pragmatic Programmer')
+  })
 })
 
-test('there are two blogs at the beginning', async () => {
-  const response = await api.get('/api/blogs')
+describe('adds a new blog', () => {
+  test('a valid blog can be added', async () => {
+    const blog = {
+      title: 'My Testing Blog',
+      author: 'Me',
+      url: 'www.myblog.me',
+    }
 
-  expect(response.body).toHaveLength(initialBlogs.length)
-})
+    await api
+      .post('/api/blogs')
+      .send(blog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
 
-test('a specific blog is within the returned blogs', async () => {
-  const response = await api.get('/api/blogs')
-
-  const titles = response.body.map(r => r.title)
-  expect(titles).toContain('Pragmatic Programmer')
+    const response = await api.get('/api/blogs')
+    const titles = response.body.map(r => r.title)
+    expect(response.body).toHaveLength(initialBlogs.length + 1)
+    expect(titles).toContain('My Testing Blog')
+  })
 })
 
 afterAll(() => {
