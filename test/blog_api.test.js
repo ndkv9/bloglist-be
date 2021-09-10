@@ -67,6 +67,17 @@ describe('adds a new blog', () => {
     expect(response.body).toHaveLength(initialBlogs.length + 1)
     expect(titles).toContain('My Testing Blog')
   })
+
+  test('blog without title cannot be added', async () => {
+    const blog = {
+      author: 'Me',
+      url: 'www.myblog.me',
+    }
+
+    await api.post('/api/blogs').send(blog).expect(400)
+    const response = await api.get('/api/blogs')
+    expect(response.body).toHaveLength(initialBlogs.length)
+  })
 })
 
 afterAll(() => {
