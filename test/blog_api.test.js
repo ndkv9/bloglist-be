@@ -7,10 +7,11 @@ const Blog = require('../models/blog')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObj = new Blog(helper.initialBlogs[0])
-  await blogObj.save()
-  blogObj = new Blog(helper.initialBlogs[1])
-  await blogObj.save()
+
+  for (let blog of helper.initialBlogs) {
+    const blogObj = new Blog(blog)
+    await blogObj.save()
+  }
 })
 
 describe('when return blogs from server', () => {
