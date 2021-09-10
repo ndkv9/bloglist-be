@@ -1,6 +1,7 @@
 const cors = require('cors')
 const helmet = require('helmet')
 const express = require('express')
+require('express-async-errors')
 const blogsRouter = require('./controllers/blogs.js')
 const middleware = require('./utils/middleware.js')
 const app = express()
