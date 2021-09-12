@@ -126,6 +126,28 @@ describe('verify properties of blogs', () => {
   })
 })
 
+describe('update a blog', () => {
+  test('a property can be updated', async () => {
+    const blogs = await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogToUpdate = blogs.body[0]
+    blogToUpdate.likes = 69
+
+    const updatedBlog = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDB()
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+    expect(updatedBlog.body.likes).toBe(69)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
