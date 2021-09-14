@@ -2,6 +2,15 @@ const unknownEndpoint = (req, res) => {
   res.status(404).json({ error: 'unknown endpoint' })
 }
 
+const tokenExtractor = (req, res, next) => {
+  const authorization = req.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
+    req.token = authorization.slice(7)
+  }
+
+  next()
+}
+
 const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
@@ -21,4 +30,4 @@ const errorHandler = (error, request, response, next) => {
   next(error)
 }
 
-module.exports = { unknownEndpoint, errorHandler }
+module.exports = { unknownEndpoint, errorHandler, tokenExtractor }
