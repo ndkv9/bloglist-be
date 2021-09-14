@@ -36,4 +36,13 @@ const mostBlogs = arr => {
   return { author: mostOccurence, blogs: amount }
 }
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs }
+const getToken = req => {
+  const authorization = req.get('authorization')
+  if (authorization && authorization.toLowerCase().startsWith('bearer')) {
+    return authorization.slice(7)
+  }
+
+  return null
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, getToken }
