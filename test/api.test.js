@@ -9,13 +9,6 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 
 beforeEach(async () => {
-  // await Blog.deleteMany({})
-
-  // for (let blog of helper.initialBlogs) {
-  //   const blogObj = new Blog(blog)
-  //   await blogObj.save()
-  // }
-
   await User.deleteMany({})
 
   for (let user of helper.initialUsers) {
@@ -27,6 +20,21 @@ beforeEach(async () => {
     })
 
     await userObj.save()
+  }
+
+  // const userCredential = {
+  //   username: helper.initialUsers[1].username,
+  //   password: helper.initialUsers[1].password,
+  // }
+
+  // const result = await api.post('/api/login').send(userCredential)
+  // const token = result.body.token
+
+  await Blog.deleteMany({})
+
+  for (let blog of helper.initialBlogs) {
+    const blogObj = new Blog(blog)
+    await blogObj.save()
   }
 })
 
@@ -85,7 +93,6 @@ describe('when return blogs from server', () => {
 
   test('there are two blogs at the beginning', async () => {
     const response = await api.get('/api/blogs')
-
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   })
 
