@@ -10,16 +10,18 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const middleware = require('./utils/middleware.js')
 
-const url = config.MONGODB_URI
+logger.info('connecting to', config.MONGODB_URI)
 
 mongoose
-  .connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
-  // eslint-disable-next-line no-unused-vars
-  .then(result => {
+  .connect(config.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
     logger.info('connected to MongoDB')
   })
   .catch(error => {
-    logger.error('error connecting to MongoDB:', error.message)
+    logger.error('error connection to MongoDB:', error.message)
   })
 
 const app = express()
