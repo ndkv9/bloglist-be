@@ -49,6 +49,32 @@ describe('when users return from server', () => {
   })
 })
 
+describe('when a user logins', () => {
+  test('login succeeds with proper credential', async () => {
+    const userCredential = {
+      username: helper.initialUsers[0].username,
+      password: helper.initialUsers[0].password,
+    }
+
+    await api
+      .post('/api/login')
+      .send(userCredential)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+  })
+
+  test('login returns with token', async () => {
+    const userCredential = {
+      username: helper.initialUsers[0].username,
+      password: helper.initialUsers[0].password,
+    }
+
+    const result = await api.post('/api/login').send(userCredential)
+    expect(result.body.username).toBe(helper.initialUsers[0].username)
+    expect(result.body.token).toBeDefined()
+  })
+})
+
 describe('when return blogs from server', () => {
   test('blogs are returned as json', async () => {
     await api
