@@ -22,19 +22,19 @@ beforeEach(async () => {
     await userObj.save()
   }
 
-  // const userCredential = {
-  //   username: helper.initialUsers[1].username,
-  //   password: helper.initialUsers[1].password,
-  // }
+  const userCredential = {
+    username: helper.initialUsers[0].username,
+    password: helper.initialUsers[0].password,
+  }
 
-  // const result = await api.post('/api/login').send(userCredential)
-  // const token = result.body.token
+  const result = await api.post('/api/login').send(userCredential)
+  const token = result.body.token
+  const authorization = `bearer ${token}`
 
   await Blog.deleteMany({})
 
   for (let blog of helper.initialBlogs) {
-    const blogObj = new Blog(blog)
-    await blogObj.save()
+    await api.post('/api/blogs').send(blog).set('Authorization', authorization)
   }
 })
 
@@ -104,8 +104,8 @@ describe('when return blogs from server', () => {
   })
 })
 
-describe('adds a new blog', () => {
-  test('a valid blog can be added', async () => {
+describe('adds a new blog without token', () => {
+  test('will be failed with proper code', async () => {
     const blog = {
       title: 'My Testing Blog',
       author: 'Me',
@@ -115,13 +115,42 @@ describe('adds a new blog', () => {
     await api
       .post('/api/blogs')
       .send(blog)
-      .expect(201)
+      .expect(401)
       .expect('Content-Type', /application\/json/)
 
     const blogsAtEnd = await helper.blogsInDB()
-    const titles = blogsAtEnd.map(r => r.title)
-    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
-    expect(titles).toContain('My Testing Blog')
+    expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+  })
+})
+
+describe('a blog with proper token', () => {
+  let token = null
+  let authorization = null
+  beforeEach(async () => {
+    const userCredential = {
+      username: helper.initialUsers[0].username,
+      password: helper.initialUsers[0].password,
+    }
+
+    const result = await api.post('/api/login').send(userCredential)
+    token = result.body.token
+    authorization = `bearer ${token}`
+    expect(token).toBeTruthy()
+  })
+
+  test('can be added succeed with proper status code', async () => {
+    const newBlog = {
+      title: 'testing blog with token',
+      author: 'tui',
+      url: 'www.testing.me',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .set('Authorization', authorization)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
   })
 
   test('blog without title and url cannot be added', async () => {
@@ -129,31 +158,37 @@ describe('adds a new blog', () => {
       author: 'Me',
     }
 
-    await api.post('/api/blogs').send(blog).expect(400)
+    await api
+      .post('/api/blogs')
+      .send(blog)
+      .set('Authorization', authorization)
+      .expect(400)
     const blogsAtEnd = await helper.blogsInDB()
     expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
   })
-})
 
-describe('a specific blog can be', () => {
-  test('viewed as expected', async () => {
+  test('can be viewed as expected', async () => {
     const blogsAtStart = await helper.blogsInDB()
     const blogToView = blogsAtStart[0]
 
     const returnedBlog = await api
       .get(`/api/blogs/${blogToView.id}`)
       .expect(200)
+      .set('Authorization', authorization)
       .expect('Content-Type', /application\/json/)
 
     const processedBlogToView = JSON.parse(JSON.stringify(blogToView))
     expect(returnedBlog.body).toEqual(processedBlogToView)
   })
 
-  test('deleted', async () => {
+  test('can be deleted', async () => {
     const blogsAtStart = await helper.blogsInDB()
     const blogToDel = blogsAtStart[0]
 
-    await api.delete(`/api/blogs/${blogToDel.id}`).expect(204)
+    await api
+      .delete(`/api/blogs/${blogToDel.id}`)
+      .set('Authorization', authorization)
+      .expect(204)
 
     const blogsAtEnd = await helper.blogsInDB()
     const titles = blogsAtEnd.map(b => b.title)
@@ -161,13 +196,12 @@ describe('a specific blog can be', () => {
     expect(blogsAtEnd).toHaveLength(blogsAtStart.length - 1)
     expect(titles).not.toContain(blogToDel.title)
   })
-})
 
-describe('verify properties of blogs', () => {
-  test('verify id property', async () => {
+  test('can be verified id property', async () => {
     const blogs = await api
       .get('/api/blogs')
       .expect(200)
+      .set('Authorization', authorization)
       .expect('Content-Type', /application\/json/)
 
     blogs.body.map(b => {
@@ -175,7 +209,7 @@ describe('verify properties of blogs', () => {
     })
   })
 
-  test('verify the likes property values is 0 if it is missing', async () => {
+  test('has likes property values is 0 if it is missing', async () => {
     const blogToSave = {
       title: 'testing blog',
       author: 'Me',
@@ -185,6 +219,7 @@ describe('verify properties of blogs', () => {
     await api
       .post('/api/blogs')
       .send(blogToSave)
+      .set('Authorization', authorization)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
