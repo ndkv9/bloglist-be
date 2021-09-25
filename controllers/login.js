@@ -13,7 +13,7 @@ loginRouter.post('/', async (req, res) => {
     : false
 
   if (!(user && correctPassword)) {
-    return res.status(401).json({ error: 'invalid credential' })
+    return res.status(401).json({ error: 'invalid credentials' })
   }
 
   const payload = {
