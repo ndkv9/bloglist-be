@@ -1,11 +1,11 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
-const unknownEndpoint = (req, res) => {
+const unknownEndpoint = (_req, res) => {
   res.status(404).json({ error: 'unknown endpoint' })
 }
 
-const tokenExtractor = (req, res, next) => {
+const tokenExtractor = (req, _res, next) => {
   const authorization = req.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer')) {
     req.token = authorization.slice(7)
@@ -29,7 +29,7 @@ const userExtractor = async (req, res, next) => {
   next()
 }
 
-const errorHandler = (error, request, response, next) => {
+const errorHandler = (error, _request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (
